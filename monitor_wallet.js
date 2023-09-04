@@ -3,11 +3,88 @@ const { EvmChain }=require("@moralisweb3/common-evm-utils");
 const express=require('express')
 const app=express()
 app.use(express.json())
-const Abi= [
+// const Abi= [
+//     {
+//       "inputs": [],
+//       "stateMutability": "nonpayable",
+//       "type": "constructor"
+//     },
+//     {
+//       "anonymous": false,
+//       "inputs": [
+//         {
+//           "indexed": false,
+//           "internalType": "string",
+//           "name": "name",
+//           "type": "string"
+//         },
+//         {
+//           "indexed": false,
+//           "internalType": "uint256",
+//           "name": "contactInfo",
+//           "type": "uint256"
+//         }
+//       ],
+//       "name": "storeContact",
+//       "type": "event"
+//     },
+//     {
+//       "inputs": [
+//         {
+//           "internalType": "string",
+//           "name": "name",
+//           "type": "string"
+//         },
+//         {
+//           "internalType": "uint256",
+//           "name": "contactNo",
+//           "type": "uint256"
+//         }
+//       ],
+//       "name": "Store",
+//       "outputs": [],
+//       "stateMutability": "nonpayable",
+//       "type": "function"
+//     },
+//     {
+//       "inputs": [],
+//       "name": "i_owner",
+//       "outputs": [
+//         {
+//           "internalType": "address",
+//           "name": "",
+//           "type": "address"
+//         }
+//       ],
+//       "stateMutability": "view",
+//       "type": "function"
+//     }
+//   ]
+const Abi=
+[
     {
       "inputs": [],
       "stateMutability": "nonpayable",
       "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "contactInfo",
+          "type": "uint256"
+        }
+      ],
+      "name": "contactRemoved",
+      "type": "event"
     },
     {
       "anonymous": false,
@@ -41,9 +118,51 @@ const Abi= [
           "type": "uint256"
         }
       ],
+      "name": "RemoveContact",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "contactNo",
+          "type": "uint256"
+        }
+      ],
       "name": "Store",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "name": "UserToContact",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -61,19 +180,18 @@ const Abi= [
     }
   ]
 
-
 app.get('/createStream',async(req,res)=>{
         const stream = {
     //   chains: [EvmChain.ETHEREUM, EvmChain.POLYGON], // list of blockchains to monitor
     chains:[EvmChain.SEPOLIA],  
-    description: "jithu's wallet", // your description
-      tag: "jithu", // give it a tag
+    description: "updated stream to store contact details", // your description
+      tag: "ContactStream", // give it a tag
       webhookUrl: "https://a484-103-160-194-170.ngrok-free.app/user", // webhook url to receive events,
 
     //   includeNativeTxs: true,
       includeContractLogs:true,
       abi:Abi,
-      topic0:["storeContact(string,uint256)"],
+      topic0:["storeContact(string,uint256)","contactRemoved(string,uint256)"],
     //   advancedOptions:[
     // {   'topic0':'storeContact(string,uint256)',
     //     'filter':{
@@ -87,7 +205,10 @@ app.get('/createStream',async(req,res)=>{
     const { id } = newStream.toJSON(); // { id: 'YOUR_STREAM_ID', ...newStream }
     
     // Now we attach bobs address to the stream 
-    const address = "0xb77fA9E3E251F434573972429EDfbaBD755A9d09";
+    // const address = "0xb77fA9E3E251F434573972429EDfbaBD755A9d09";
+    const address = "0x412bc555508e4e91bACaCFCB0Af717F7a4249A46";
+
+
     //address can also be an array of values also
     
     await Moralis.Streams.addAddress({ address, id });
